@@ -1,0 +1,27 @@
+{
+  "name": "d3-simulation",
+  "version": "0.0.0",
+  "description": "A simple framework for d3 canvas 'simulations'",
+  "main": "simulation.js",
+  "dependencies": {
+    "d3": "^3.4.12"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@jl.github.com:jimlloyd/d3-simulation.git"
+  },
+  "keywords": [
+    "d3",
+    "canvas",
+    "simulation",
+    "animation",
+    "minimal",
+    "framework"
+  ],
+  "author": "Jim Lloyd <jim.lloyd@gmail.com>",
+  "license": "ISC"
+}
