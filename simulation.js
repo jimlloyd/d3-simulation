@@ -1,5 +1,9 @@
 var d3 = require('d3');
 
+function defaultInitializeModel() {}
+function defaultUpdateModel(elapsed) {}
+function defaultRenderFrame() {}
+
 function Simulation(opts) {
   var self = this;
   if (!(self instanceof Simulation)) {
@@ -8,10 +12,16 @@ function Simulation(opts) {
 
   self.domainMin = opts.domainMin || -5;
   self.domainMax = opts.domainMin || 5;
-  Simulation.prototype.renderFrame = opts.renderFrame;
+  Simulation.prototype.initializeModel = opts.initializeModel || defaultInitializeModel;
+  Simulation.prototype.updateModel = opts.updateModel || defaultUpdateModel;
+  Simulation.prototype.renderFrame = opts.renderFrame || defaultRenderFrame;
 
   var viewSelector = opts.selection || "#simulation";
   self.viewContainer = d3.select(viewSelector).node();
+
+  // Create an in memory only element of type 'custom'
+  self.modelContainer = document.createElement("custom");
+  self.model = d3.select(self.modelContainer);
 
   self.stopped = false;
   self.d3canvas = d3.select(viewSelector + " canvas")
@@ -23,9 +33,14 @@ function Simulation(opts) {
 
   self.canvas = self.d3canvas.node();
   self.ctx = self.canvas.getContext("2d");
+  self.frames = 0;
 }
 
 exports.Simulation = Simulation;
+
+Simulation.prototype.initializeModel = defaultInitializeModel;
+Simulation.prototype.updateModel = defaultUpdateModel;
+Simulation.prototype.renderFrame = defaultRenderFrame;
 
 Simulation.prototype.clearCanvas = function() {
   var self = this;
@@ -34,13 +49,18 @@ Simulation.prototype.clearCanvas = function() {
 
 Simulation.prototype.run = function() {
   var self = this;
+  self.initializeModel();
   d3.timer(function doOneFrame(elapsed) {
     // this.t -> absolute time in millis when this timer was started
     // elapsed -> the number of milliseconds since this timer started.
     // this.t + elapsedTime -> now
-    self.updateView();
-    self.clearCanvas();
-    self.renderFrame();
+    self.updateModel(elapsed);
+    if (!self.stopped) {
+      self.updateView();
+      self.clearCanvas();
+      self.renderFrame();
+      ++self.frames;
+    }
     return self.stopped;
   });
 };
